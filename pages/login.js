@@ -7,18 +7,19 @@ import {
   GoogleAuthProvider,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
+import { auth, db } from "@/firebase/firebase";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/authContext.js";
 import { toast } from "react-toastify";
 import ToastMessage from "@/components/ToastMessage.jsx";
 import Loader from "@/components/Loader.jsx";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const gprovider = new GoogleAuthProvider();
 
 const Login = () => {
   const router = useRouter();
-  const { currentUser, isLoading } = useAuth();
+  const { currentUser, isLoading, setCurrentUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailInvalid, setEmailInvalid] = useState(false);
@@ -56,7 +57,32 @@ const Login = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, gprovider);
+      // Use signInWithPopup and await for the UserCredential object
+      const result = await signInWithPopup(auth, gprovider);
+      const user = result.user; // Access the user property from the UserCredential object
+
+      // Check if the user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      // If the user doesn't exist, create a new user document in Firestore
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          // Add other properties that you want to store in the user document
+        });
+      }
+
+      // Set the currentUser state with the signed-in user
+      setCurrentUser({
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
     } catch (error) {
       console.error(error);
     }

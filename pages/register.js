@@ -11,14 +11,14 @@ import { auth, db } from "@/firebase/firebase";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/authContext.js";
 import { profileColors } from "@/utills/constants.js";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Loader from "@/components/Loader";
 
 const gprovider = new GoogleAuthProvider();
 
 const Register = () => {
   const router = useRouter();
-  const { currentUser, isLoading } = useAuth();
+  const { currentUser, isLoading, setCurrentUser } = useAuth();
   const [disabled, setDisabled] = useState(true);
   const [showPasswordHint, setShowPasswordHint] = useState(false);
   const [showDisplayNameWarning, setShowDisplayNameWarning] = useState(false);
@@ -32,7 +32,32 @@ const Register = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, gprovider);
+      // Use signInWithPopup and await for the UserCredential object
+      const result = await signInWithPopup(auth, gprovider);
+      const user = result.user; // Access the user property from the UserCredential object
+
+      // Check if the user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      // If the user doesn't exist, create a new user document in Firestore
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          // Add other properties that you want to store in the user document
+        });
+      }
+
+      // Set the currentUser state with the signed-in user
+      setCurrentUser({
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
     } catch (error) {
       console.error(error);
     }
