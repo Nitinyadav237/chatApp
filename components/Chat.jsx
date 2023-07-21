@@ -9,11 +9,11 @@ const Chat = () => {
   const { currentUser } = useAuth();
   const { data, users, chats } = useChatContext();
 
-  const isUserBlocked = users[currentUser.uid]?.blockedUsers?.find((u) => u === data.user.uid);
-  const IamBlocked = users[data.user.uid]?.blockedUsers?.find((u) => u === currentUser.uid);
+  const isUserBlocked = users[currentUser?.uid]?.blockedUsers?.find((u) => u === data?.user?.uid);
+  const IamBlocked = users[data?.user?.uid]?.blockedUsers?.find((u) => u === currentUser?.uid);
 
   // Check if there is no active chat or every chat is deleted
-  const noActiveChat = !data.chatId || !chats[data.chatId] || chats[data.chatId]?.chatDeleted;
+  const noActiveChat = !data?.chatId || !chats[data?.chatId] || chats[data?.chatId]?.chatDeleted;
 
   return (
     <div className='flex flex-col p-5 grow'>

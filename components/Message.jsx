@@ -19,7 +19,7 @@ const Message = ({ message }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const { users, data, imageViewer, setImageViewer, setEditMsg } =
     useChatContext();
-  const self = message.sender === currentUser.uid;
+  const self = message.sender === currentUser?.uid;
 
   const timestamp = new Timestamp(
     message.date?.seconds,
@@ -37,11 +37,11 @@ const Message = ({ message }) => {
       const chatRef = doc(db, "chats", data.chatId);
       const chatDoc = await getDoc(chatRef);
 
-      const updatedMessages = chatDoc.data().messages.map((message) => {
-        if (message.id === messageId) {
+      const updatedMessages = chatDoc?.data()?.messages?.map((message) => {
+        if (message?.id === messageId) {
           if (action === DELETED_FOR_ME) {
             message.deletedInfo = {
-              [currentUser.uid]: DELETED_FOR_ME,
+              [currentUser?.uid]: DELETED_FOR_ME,
             };
           }
           if (action === DELETED_FOR_EVERYONE) {
@@ -80,7 +80,7 @@ const Message = ({ message }) => {
         >
           <Avatar
             size="small"
-            user={self ? currentUser : users[data.user.uid]}
+            user={self ? currentUser : users[data?.user?.uid]}
             className="mb-4"
           />
           <div

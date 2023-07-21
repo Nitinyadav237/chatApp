@@ -43,8 +43,8 @@ const Chats = () => {
     onSnapshot(collection(db, "users"), (snapshot) => {
       const updatedUsers = {};
       snapshot.forEach((doc) => {
-        updatedUsers[doc.id] = doc.data();
-        console.log(doc.data());
+        updatedUsers[doc?.id] = doc?.data();
+        console.log(doc?.data());
       });
       setUsers(updatedUsers);
       if (!isBlockExecutedRef.current) {
@@ -64,11 +64,9 @@ const Chats = () => {
     const unsub = onSnapshot(q, (snapshot) => {
       let msgs = {};
       snapshot.forEach((doc) => {
-        if (doc.id !== data.chatId) {
-          msgs[doc.id] = doc
-            .data()
-            .messages.filter(
-              (m) => m?.read === false && m?.sender !== currentUser.uid
+        if (doc?.id !== data?.chatId) {
+          msgs[doc?.id] = doc?.data()?.messages?.filter(
+              (m) => m?.read === false && m?.sender !== currentUser?.uid
             );
         }
         Object.keys(msgs || {}).map((c) => {
@@ -84,14 +82,14 @@ const Chats = () => {
 
   useEffect(() => {
     const getChats = () => {
-      const unsub = onSnapshot(doc(db, "userChats", currentUser.uid), (doc) => {
-        if (doc.exists()) {
-          const data = doc.data();
+      const unsub = onSnapshot(doc(db, "userChats", currentUser?.uid), (doc) => {
+        if (doc?.exists()) {
+          const data = doc?.data();
           setChats(data);
 
           if (
-            !isBlockExecutedRef.current &&
-            isUsersFetchedRef.current &&
+            !isBlockExecutedRef?.current &&
+            isUsersFetchedRef?.current &&
             users
           ) {
             const firstChat = Object.values(data)
@@ -104,9 +102,9 @@ const Chats = () => {
               handleSelect(user, firstChat[0]);
 
               const chatId =
-                currentUser.uid > user.uid
-                  ? currentUser.uid + user.uid
-                  : user.uid + currentUser.uid;
+                currentUser?.uid > user?.uid
+                  ? currentUser?.uid + user?.uid
+                  : user?.uid + currentUser?.uid;
 
               readChat(chatId);
             }
@@ -117,7 +115,7 @@ const Chats = () => {
       });
       return unsub;
     };
-    currentUser.uid && getChats();
+    currentUser?.uid && getChats();
   }, [isBlockExecutedRef.current, users]);
 
   const filteredChats = Object.entries(chats || {})
@@ -132,9 +130,9 @@ const Chats = () => {
           .includes(search.toLocaleLowerCase())
     )
     .sort((a, b) => {
-      if (selectedChat && a[1].userInfo.uid === selectedChat.uid) {
+      if (selectedChat && a[1]?.userInfo?.uid === selectedChat?.uid) {
         return -1; // Keep the selected chat at the first place
-      } else if (selectedChat && b[1].userInfo.uid === selectedChat.uid) {
+      } else if (selectedChat && b[1]?.userInfo?.uid === selectedChat?.uid) {
         return 1;
       } else {
         return b[1].date - a[1].date; // Sort by date for other chats
@@ -142,19 +140,21 @@ const Chats = () => {
     });
 
   const readChat = async (chatId) => {
-    const chatRef = doc(db, "chats", chatId);
-    const chatDoc = await getDoc(chatRef);
+  const chatRef = doc(db, "chats", chatId);
+  const chatDoc = await getDoc(chatRef);
 
-    let updatedMessages = chatDoc.data().messages.map((m) => {
-      if (m?.read === false) {
-        m.read = true;
-      }
-      return m;
-    });
-    await updateDoc(chatRef, {
-      messages: updatedMessages,
-    });
-  };
+  const messages = chatDoc?.data()?.messages || [];
+  const updatedMessages = messages.map((m) => {
+    if (m?.read === false) {
+      m.read = true;
+    }
+    return m;
+  });
+
+  await updateDoc(chatRef, {
+    messages: updatedMessages,
+  });
+};
 
   const handleSelect = (user, selectedChatId) => {
     setSelectedChat(user);
@@ -209,7 +209,7 @@ const Chats = () => {
 
               const date = timestamp.toDate();
 
-              const user = users[chat[1].userInfo.uid];
+              const user = users[chat[1]?.userInfo?.uid];
               const shouldShowTime =
                 chat[1]?.lastMessage?.text ||
                 chat[1]?.lastMessage?.img ||

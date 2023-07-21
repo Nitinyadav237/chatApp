@@ -71,7 +71,7 @@ const Login = () => {
           uid: user?.uid,
           displayName: user?.displayName,
           email: user?.email,
-          photoURL: user?.photoURL,
+          photoURL: null,
           // Add other properties that you want to store in the user document
         });
       }
@@ -81,7 +81,7 @@ const Login = () => {
         uid: user?.uid,
         displayName: user?.displayName,
         email: user?.email,
-        photoURL: user?.photoURL,
+        photoURL: null,
       });
     } catch (error) {
       console.error(error);

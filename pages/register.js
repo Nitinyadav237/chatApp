@@ -46,7 +46,7 @@ const Register = () => {
           uid: user?.uid,
           displayName: user?.displayName,
           email: user?.email,
-          photoURL: user?.photoURL,
+          photoURL: null,
           // Add other properties that you want to store in the user document
         });
       }
@@ -56,7 +56,7 @@ const Register = () => {
         uid: user?.uid,
         displayName: user?.displayName,
         email: user?.email,
-        photoURL: user?.photoURL,
+        photoURL: null,
       });
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
