@@ -69,10 +69,6 @@ const LeftNav = () => {
 
   const handleUpdateProfile = (type, value) => {
     //color ,name ,phot ,photo-remove
-    if (typeof value === "undefined") {
-      console.error("Value is undefined, cannot update the profile.");
-      return;
-    }
     let obj = { ...currentUser };
     switch (type) {
       case "color":

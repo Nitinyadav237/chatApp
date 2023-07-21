@@ -25,8 +25,8 @@ const Messages = () => {
   }, [data.chatId]);
 
   const scrollToBottom = () => {
-    const chatContainer = ref.current;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    const chatContainer = ref?.current;
+    chatContainer.scrollTop = chatContainer?.scrollHeight;
   };
 
   return (
