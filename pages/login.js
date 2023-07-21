@@ -62,26 +62,26 @@ const Login = () => {
       const user = result.user; // Access the user property from the UserCredential object
 
       // Check if the user already exists in Firestore
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(db, "users", user?.uid);
       const userDoc = await getDoc(userDocRef);
 
       // If the user doesn't exist, create a new user document in Firestore
       if (!userDoc.exists()) {
         await setDoc(userDocRef, {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
+          uid: user?.uid,
+          displayName: user?.displayName,
+          email: user?.email,
+          photoURL: user?.photoURL,
           // Add other properties that you want to store in the user document
         });
       }
 
       // Set the currentUser state with the signed-in user
       setCurrentUser({
-        uid: user.uid,
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
+        uid: user?.uid,
+        displayName: user?.displayName,
+        email: user?.email,
+        photoURL: user?.photoURL,
       });
     } catch (error) {
       console.error(error);

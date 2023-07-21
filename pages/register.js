@@ -23,6 +23,7 @@ const Register = () => {
   const [showPasswordHint, setShowPasswordHint] = useState(false);
   const [showDisplayNameWarning, setShowDisplayNameWarning] = useState(false);
   const [showEmailWarning, setShowEmailWarning] = useState(false);
+  const [emailAlreadyInUse, setEmailAlreadyInUse] = useState(false);
 
   useEffect(() => {
     if (!isLoading && currentUser) {
@@ -32,34 +33,37 @@ const Register = () => {
 
   const signInWithGoogle = async () => {
     try {
-      // Use signInWithPopup and await for the UserCredential object
       const result = await signInWithPopup(auth, gprovider);
-      const user = result.user; // Access the user property from the UserCredential object
+      const user = result.user;
 
       // Check if the user already exists in Firestore
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(db, "users", user?.uid); // Add optional chaining here
       const userDoc = await getDoc(userDocRef);
 
       // If the user doesn't exist, create a new user document in Firestore
       if (!userDoc.exists()) {
         await setDoc(userDocRef, {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
+          uid: user?.uid,
+          displayName: user?.displayName,
+          email: user?.email,
+          photoURL: user?.photoURL,
           // Add other properties that you want to store in the user document
         });
       }
 
       // Set the currentUser state with the signed-in user
       setCurrentUser({
-        uid: user.uid,
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
+        uid: user?.uid,
+        displayName: user?.displayName,
+        email: user?.email,
+        photoURL: user?.photoURL,
       });
     } catch (error) {
-      console.error(error);
+      if (error.code === "auth/email-already-in-use") {
+        setEmailAlreadyInUse(true);
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -120,10 +124,13 @@ const Register = () => {
         displayName,
       });
 
-      console.log(user);
       router.push("/");
     } catch (error) {
-      console.error(error);
+      if (error.code === "auth/email-already-in-use") {
+        setEmailAlreadyInUse(true);
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -244,6 +251,12 @@ const Register = () => {
             {showPasswordHint && (
               <span className="text-red-500 text-sm mt-2">
                 Password should be at least 6 characters long.
+              </span>
+            )}
+            {emailAlreadyInUse && (
+              <span className="text-red-500 text-sm mt-2">
+                Email is already in use. Please use a different email or log in
+                with the existing account.
               </span>
             )}
 
